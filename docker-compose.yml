@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: nativa_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nativa
+      POSTGRES_PASSWORD: nativa123
+      POSTGRES_DB: nativa
+    ports:
+      - "5432:5432"
+    volumes:
+      - nativa_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nativa"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend-dotnet
+      dockerfile: Dockerfile
+    container_name: nativa_api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=nativa;Username=nativa;Password=nativa123"
+      Anthropic__ApiKey: "${ANTHROPIC_API_KEY}"
+      Jwt__Secret: "super-secret-jwt-key-change-in-production-min-32-chars"
+      Jwt__Issuer: "nativa-api"
+      Jwt__Audience: "nativa-app"
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  nativa_pgdata:
