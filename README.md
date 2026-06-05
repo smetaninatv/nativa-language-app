@@ -2,6 +2,8 @@
 
 Voice conversation app with AI corrections, progress tracking, and A1→C2 learning plans.
 
+<img width="768" height="1162" alt="image" src="https://github.com/user-attachments/assets/3c499971-91c3-422f-be20-f8eeb17341b9" />
+
 ## Stack
 
 | Layer | Technology |
